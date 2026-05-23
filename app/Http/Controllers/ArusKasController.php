@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ArusKas;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ArusKasExport;
@@ -18,7 +19,7 @@ use Carbon\Carbon;
  */
 class ArusKasController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = ArusKas::query();
 
@@ -49,27 +50,28 @@ class ArusKasController extends Controller
         $arusKas = $query->latest('tanggal')->paginate(10)->withQueryString();
 
         // Hitung saldo real-time
-        $totalPemasukan   = ArusKas::pemasukan()->sum('jumlah');
-        $totalPengeluaran = ArusKas::pengeluaran()->sum('jumlah');
-        $saldo            = $totalPemasukan - $totalPengeluaran;
+        $totalPemasukan   = (float) ArusKas::pemasukan()->sum('jumlah');
+        $totalPengeluaran = (float) ArusKas::pengeluaran()->sum('jumlah');
+        $saldo            = (float) ($totalPemasukan - $totalPengeluaran);
 
         // Saldo bulan ini
         $bulanIni = Carbon::now();
-        $pemasukanBulan   = ArusKas::pemasukan()->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->sum('jumlah');
-        $pengeluaranBulan = ArusKas::pengeluaran()->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->sum('jumlah');
+        $pemasukanBulan   = (float) ArusKas::pemasukan()->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->sum('jumlah');
+        $pengeluaranBulan = (float) ArusKas::pengeluaran()->whereMonth('tanggal', $bulanIni->month)->whereYear('tanggal', $bulanIni->year)->sum('jumlah');
 
         // Daftar kategori
         $kategoriList = ArusKas::distinct()->pluck('kategori');
 
-        return view('arus-kas.index', compact(
-            'arusKas',
-            'totalPemasukan',
-            'totalPengeluaran',
-            'saldo',
-            'pemasukanBulan',
-            'pengeluaranBulan',
-            'kategoriList'
-        ));
+        return Inertia::render('cash-flow/arus-kas/Index', [
+            'arusKas' => $arusKas,
+            'totalPemasukan' => $totalPemasukan,
+            'totalPengeluaran' => $totalPengeluaran,
+            'saldo' => $saldo,
+            'pemasukanBulan' => $pemasukanBulan,
+            'pengeluaranBulan' => $pengeluaranBulan,
+            'kategoriList' => $kategoriList,
+            'filters' => $request->only(['search', 'jenis', 'kategori', 'tanggal_dari', 'tanggal_sampai']),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -95,9 +97,9 @@ class ArusKasController extends Controller
             ->with('success', 'Transaksi arus kas berhasil dicatat.');
     }
 
-    public function show(ArusKas $arusKas): View
+    public function show(ArusKas $arusKas): \Illuminate\Http\JsonResponse
     {
-        return view('arus-kas.show', compact('arusKas'));
+        return response()->json($arusKas);
     }
 
     public function update(Request $request, ArusKas $arusKas): RedirectResponse

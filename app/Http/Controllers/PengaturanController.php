@@ -8,18 +8,22 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * PengaturanController - Pengaturan Aplikasi dan Profil Pengguna.
  */
 class PengaturanController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
         $pengaturan = Pengaturan::getSetting();
         $user = Auth::user();
-        return view('pengaturan.index', compact('pengaturan', 'user'));
+        return Inertia::render('settings/pengaturan/Index', [
+            'pengaturan' => $pengaturan,
+            'user' => $user,
+        ]);
     }
 
     /**
