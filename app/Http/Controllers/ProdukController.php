@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProdukExport;
@@ -23,7 +24,7 @@ class ProdukController extends Controller
     /**
      * Tampilkan daftar produk dengan filter dan pencarian.
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Produk::with('stok');
 
@@ -45,7 +46,11 @@ class ProdukController extends Controller
         // Daftar kategori untuk dropdown filter
         $kategoriList = Produk::distinct()->pluck('kategori');
 
-        return view('produk.index', compact('produk', 'kategoriList'));
+        return Inertia::render('master/produk/Index', [
+            'produk' => $produk,
+            'kategoriList' => $kategoriList,
+            'filters' => $request->only(['search', 'kategori']),
+        ]);
     }
 
     /**
@@ -96,12 +101,12 @@ class ProdukController extends Controller
     }
 
     /**
-     * Tampilkan detail produk (untuk modal).
+     * Tampilkan detail produk (untuk JSON fetch).
      */
-    public function show(Produk $produk): View
+    public function show(Produk $produk): \Illuminate\Http\JsonResponse
     {
         $produk->load('stok');
-        return view('produk.show', compact('produk'));
+        return response()->json($produk);
     }
 
     /**

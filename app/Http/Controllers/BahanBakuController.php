@@ -7,7 +7,8 @@ use App\Models\StokBahanBaku;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BahanBakuExport;
@@ -18,7 +19,7 @@ use App\Imports\BahanBakuImport;
  */
 class BahanBakuController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = BahanBaku::with('stok');
 
@@ -36,7 +37,11 @@ class BahanBakuController extends Controller
         $bahanBaku = $query->latest()->paginate(10)->withQueryString();
         $kategoriList = BahanBaku::distinct()->pluck('kategori');
 
-        return view('bahan-baku.index', compact('bahanBaku', 'kategoriList'));
+        return Inertia::render('master/bahan-baku/Index', [
+            'bahanBaku' => $bahanBaku,
+            'kategoriList' => $kategoriList,
+            'filters' => $request->only(['search', 'kategori']),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -71,10 +76,10 @@ class BahanBakuController extends Controller
             ->with('success', 'Bahan baku berhasil ditambahkan.');
     }
 
-    public function show(BahanBaku $bahanBaku): View
+    public function show(BahanBaku $bahanBaku): \Illuminate\Http\JsonResponse
     {
         $bahanBaku->load('stok');
-        return view('bahan-baku.show', compact('bahanBaku'));
+        return response()->json($bahanBaku);
     }
 
     public function update(Request $request, BahanBaku $bahanBaku): RedirectResponse

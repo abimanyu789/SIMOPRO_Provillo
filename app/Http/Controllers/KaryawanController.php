@@ -6,7 +6,8 @@ use App\Models\Karyawan;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\KaryawanExport;
@@ -17,7 +18,7 @@ use App\Imports\KaryawanImport;
  */
 class KaryawanController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Karyawan::query();
 
@@ -40,7 +41,11 @@ class KaryawanController extends Controller
         $karyawan = $query->latest()->paginate(10)->withQueryString();
         $posisiList = Karyawan::distinct()->pluck('posisi');
 
-        return view('karyawan.index', compact('karyawan', 'posisiList'));
+        return Inertia::render('master/karyawan/Index', [
+            'karyawan' => $karyawan,
+            'posisiList' => $posisiList,
+            'filters' => $request->only(['search', 'posisi', 'status']),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -76,9 +81,9 @@ class KaryawanController extends Controller
             ->with('success', 'Karyawan berhasil ditambahkan.');
     }
 
-    public function show(Karyawan $karyawan): View
+    public function show(Karyawan $karyawan): \Illuminate\Http\JsonResponse
     {
-        return view('karyawan.show', compact('karyawan'));
+        return response()->json($karyawan);
     }
 
     public function update(Request $request, Karyawan $karyawan): RedirectResponse

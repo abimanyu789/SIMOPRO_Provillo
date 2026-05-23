@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\CustomerExport;
@@ -16,7 +17,7 @@ use App\Imports\CustomerImport;
  */
 class CustomerController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Customer::withCount('pesanan');
 
@@ -35,7 +36,11 @@ class CustomerController extends Controller
         $customer = $query->latest()->paginate(10)->withQueryString();
         $kotaList = Customer::distinct()->whereNotNull('kota')->pluck('kota');
 
-        return view('customer.index', compact('customer', 'kotaList'));
+        return Inertia::render('master/customer/Index', [
+            'customer' => $customer,
+            'kotaList' => $kotaList,
+            'filters' => $request->only(['search', 'kota']),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -58,10 +63,10 @@ class CustomerController extends Controller
             ->with('success', 'Pelanggan berhasil ditambahkan.');
     }
 
-    public function show(Customer $customer): View
+    public function show(Customer $customer): \Illuminate\Http\JsonResponse
     {
         $customer->load(['pesanan' => fn ($q) => $q->latest()->take(5)]);
-        return view('customer.show', compact('customer'));
+        return response()->json($customer);
     }
 
     public function update(Request $request, Customer $customer): RedirectResponse
