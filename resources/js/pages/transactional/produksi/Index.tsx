@@ -386,7 +386,7 @@ export default function ProduksiIndex({ produksi, karyawanList, pesananList, tot
                                 >
                                     <option value="">-- Pilih Karyawan --</option>
                                     {karyawanList.map((k) => (
-                                        <option key={k.id} value={k.id}>{k.nama} ({k.posisi})</option>
+                                        <option key={k.id} value={k.id}>{k.nama} ({k.jabatan})</option>
                                     ))}
                                 </select>
                                 {(createForm.errors.karyawan_id || blurErrors.karyawan_id) && (
@@ -659,7 +659,7 @@ export default function ProduksiIndex({ produksi, karyawanList, pesananList, tot
                             <div>
                                 <h4 className="font-bold text-lg text-slate-900">{selectedProd.karyawan?.nama}</h4>
                                 <span className="inline-block text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase mt-1">
-                                    {selectedProd.karyawan?.posisi}
+                                    {selectedProd.karyawan?.jabatan}
                                 </span>
                             </div>
 
