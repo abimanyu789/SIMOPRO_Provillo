@@ -9,7 +9,8 @@ use App\Models\Produksi;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ProduksiExport;
@@ -21,7 +22,7 @@ use App\Exports\ProduksiExport;
  */
 class ProduksiController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Produksi::with(['karyawan', 'pesanan.customer'])->latest();
 
@@ -45,11 +46,17 @@ class ProduksiController extends Controller
         $pesananList = Pesanan::whereIn('status', ['diproses', 'produksi'])->with('customer')->get();
 
         // Statistik total upah bulan ini
-        $totalUpahBulanIni = Produksi::whereMonth('tanggal_produksi', now()->month)
+        $totalUpahBulanIni = (float) Produksi::whereMonth('tanggal_produksi', now()->month)
             ->whereYear('tanggal_produksi', now()->year)
             ->sum('total_upah');
 
-        return view('produksi.index', compact('produksi', 'karyawanList', 'pesananList', 'totalUpahBulanIni'));
+        return Inertia::render('transactional/produksi/Index', [
+            'produksi' => $produksi,
+            'karyawanList' => $karyawanList,
+            'pesananList' => $pesananList,
+            'totalUpahBulanIni' => $totalUpahBulanIni,
+            'filters' => $request->only(['search', 'karyawan_id', 'tanggal']),
+        ]);
     }
 
     /**
@@ -113,10 +120,10 @@ class ProduksiController extends Controller
             ->with('success', 'Log produksi berhasil disimpan. Upah telah dicatat di arus kas.');
     }
 
-    public function show(Produksi $produksi): View
+    public function show(Produksi $produksi): \Illuminate\Http\JsonResponse
     {
         $produksi->load(['karyawan', 'pesanan.customer', 'pesanan.detailPesanan.produk']);
-        return view('produksi.show', compact('produksi'));
+        return response()->json($produksi);
     }
 
     public function update(Request $request, Produksi $produksi): RedirectResponse

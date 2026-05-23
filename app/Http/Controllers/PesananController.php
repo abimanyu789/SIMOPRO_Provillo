@@ -11,7 +11,8 @@ use App\Models\StokProduk;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 /**
@@ -27,7 +28,7 @@ class PesananController extends Controller
     /**
      * Daftar semua pesanan dengan filter status dan pencarian.
      */
-    public function index(Request $request): View
+    public function index(Request $request): Response
     {
         $query = Pesanan::with('customer')->latest();
 
@@ -50,7 +51,15 @@ class PesananController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        return view('pesanan.index', compact('pesanan', 'customers', 'statusCount'));
+        $produkList = Produk::with('stok')->orderBy('nama_produk')->get();
+
+        return Inertia::render('transactional/pesanan/Index', [
+            'pesanan' => $pesanan,
+            'customers' => $customers,
+            'statusCount' => $statusCount,
+            'produkList' => $produkList,
+            'filters' => $request->only(['search', 'status']),
+        ]);
     }
 
     /**
@@ -134,12 +143,12 @@ class PesananController extends Controller
     }
 
     /**
-     * Detail pesanan lengkap.
+     * Detail pesanan lengkap (untuk JSON fetch).
      */
-    public function show(Pesanan $pesanan): View
+    public function show(Pesanan $pesanan): \Illuminate\Http\JsonResponse
     {
         $pesanan->load(['customer', 'detailPesanan.produk', 'produksi.karyawan']);
-        return view('pesanan.show', compact('pesanan'));
+        return response()->json($pesanan);
     }
 
     /**
