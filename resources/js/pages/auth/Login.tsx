@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Login() {
+    const { pengaturanUsaha } = usePage<any>().props;
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
@@ -30,11 +31,15 @@ export default function Login() {
                 {/* Left Panel - Branding */}
                 <div className="hidden lg:flex flex-col items-center justify-center p-12 text-white bg-gradient-to-br from-blue-700 via-blue-800 to-blue-600">
                     <div className="mb-8 animate-bounce duration-[3000ms]">
-                        <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20">
-                            <i className="ri-shoe-line text-5xl text-blue-200"></i>
+                        <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 overflow-hidden">
+                            {pengaturanUsaha?.logo ? (
+                                <img src={`/storage/${pengaturanUsaha.logo}`} alt={pengaturanUsaha.nama_usaha} className="w-full h-full object-cover p-2" />
+                            ) : (
+                                <i className="ri-shoe-line text-5xl text-blue-200"></i>
+                            )}
                         </div>
                     </div>
-                    <h1 className="text-3xl font-bold mb-3">SIMOPRO</h1>
+                    <h1 className="text-3xl font-bold mb-3">{pengaturanUsaha?.nama_usaha || 'SIMOPRO'}</h1>
                     <p className="text-blue-200 text-center text-sm leading-relaxed mb-8">
                         Sistem Informasi Manajemen Operasional<br />
                         <span className="font-semibold text-white">Provillo</span> — Produsen Sepatu Berkualitas
@@ -60,11 +65,15 @@ export default function Login() {
                 <div className="bg-white/95 backdrop-blur-md p-10 flex flex-col justify-center">
                     {/* Logo Mobile */}
                     <div className="flex items-center gap-3 mb-8 lg:mb-10">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
-                            <i className="ri-shoe-line text-white text-xl"></i>
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center overflow-hidden">
+                            {pengaturanUsaha?.logo ? (
+                                <img src={`/storage/${pengaturanUsaha.logo}`} alt={pengaturanUsaha.nama_usaha} className="w-full h-full object-cover p-1" />
+                            ) : (
+                                <i className="ri-shoe-line text-white text-xl"></i>
+                            )}
                         </div>
                         <div>
-                            <h2 className="font-bold text-gray-900 text-lg">SIMOPRO</h2>
+                            <h2 className="font-bold text-gray-900 text-lg">{pengaturanUsaha?.nama_usaha || 'SIMOPRO'}</h2>
                             <p className="text-blue-600 text-xs font-semibold">Provillo Management System</p>
                         </div>
                     </div>
