@@ -72,7 +72,7 @@ export default function Login() {
                     <h3 className="text-2xl font-bold text-gray-900 mb-1">Selamat Datang!</h3>
                     <p className="text-gray-500 text-sm mb-8">Masuk ke akun Anda untuk melanjutkan.</p>
 
-                    <form onSubmit={handleSubmit} novalidate>
+                    <form onSubmit={handleSubmit} noValidate>
                         {/* Email Field */}
                         <div className="mb-5">
                             <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="email">
@@ -87,9 +87,8 @@ export default function Login() {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     placeholder="masukkan email anda"
-                                    className={`w-full border-1.5 border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all ${
-                                        errors.email ? 'border-rose-500 ring-rose-500/10' : ''
-                                    }`}
+                                    className={`w-full border-1.5 border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all ${errors.email ? 'border-rose-500 ring-rose-500/10' : ''
+                                        }`}
                                 />
                             </div>
                             {errors.email && (
@@ -113,9 +112,8 @@ export default function Login() {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     placeholder="Masukkan password"
-                                    className={`w-full border-1.5 border-gray-200 rounded-xl py-3 pl-12 pr-12 text-sm text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all ${
-                                        errors.password ? 'border-rose-500 ring-rose-500/10' : ''
-                                    }`}
+                                    className={`w-full border-1.5 border-gray-200 rounded-xl py-3 pl-12 pr-12 text-sm text-gray-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all ${errors.password ? 'border-rose-500 ring-rose-500/10' : ''
+                                        }`}
                                 />
                                 <button
                                     type="button"
