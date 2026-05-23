@@ -35,12 +35,29 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        // Get shop settings
+        $settings = \App\Models\Pengaturan::first();
+        if ($settings) {
+            $settings->logo_url = $settings->logo_url; // trigger accessor
+        }
+
+        // Get active user with accessor trigger
+        $user = $request->user();
+        if ($user) {
+            $user->foto_url = $user->foto_url; // trigger accessor
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
+            'flash' => [
+                'success' => session('success'),
+                'error'   => session('error'),
+            ],
+            'pengaturanUsaha' => $settings,
         ];
     }
 }

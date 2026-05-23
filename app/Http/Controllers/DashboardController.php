@@ -11,7 +11,8 @@ use App\Models\Produksi;
 use App\Models\StokBahanBaku;
 use App\Models\StokProduk;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Carbon\Carbon;
 
 /**
@@ -23,7 +24,7 @@ class DashboardController extends Controller
     /**
      * Tampilkan halaman dashboard dengan statistik dan data ringkasan.
      */
-    public function index(): View
+    public function index(): Response
     {
         $now = Carbon::now();
         $bulanIni = $now->month;
@@ -87,21 +88,21 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
 
-        return view('dashboard.index', compact(
-            'totalPesananAktif',
-            'pemasukanBulanIni',
-            'pengeluaranBulanIni',
-            'saldoTotal',
-            'totalProduk',
-            'totalKaryawan',
-            'totalCustomer',
-            'produksiHariIni',
-            'stokProdukAlert',
-            'stokBahanAlert',
-            'chartData',
-            'pesananTerbaru',
-            'statusPesanan'
-        ));
+        return Inertia::render('Dashboard', [
+            'totalPesananAktif' => $totalPesananAktif,
+            'pemasukanBulanIni' => (float)$pemasukanBulanIni,
+            'pengeluaranBulanIni' => (float)$pengeluaranBulanIni,
+            'saldoTotal' => (float)$saldoTotal,
+            'totalProduk' => $totalProduk,
+            'totalKaryawan' => $totalKaryawan,
+            'totalCustomer' => $totalCustomer,
+            'produksiHariIni' => (float)$produksiHariIni,
+            'stokProdukAlert' => $stokProdukAlert,
+            'stokBahanAlert' => $stokBahanAlert,
+            'chartData' => $chartData,
+            'pesananTerbaru' => $pesananTerbaru,
+            'statusPesanan' => $statusPesanan,
+        ]);
     }
 
     /**

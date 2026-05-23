@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * AuthController - Mengelola autentikasi pengguna.
@@ -19,12 +20,12 @@ class AuthController extends Controller
      * Tampilkan halaman login.
      * Redirect ke dashboard jika sudah login.
      */
-    public function showLogin(): View|RedirectResponse
+    public function showLogin(): Response|RedirectResponse
     {
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
-        return view('auth.login');
+        return Inertia::render('auth/Login');
     }
 
     /**
