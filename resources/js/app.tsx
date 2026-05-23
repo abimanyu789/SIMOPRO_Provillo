@@ -6,7 +6,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'SIMOPRO';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')) as any,
     setup({ el, App, props }) {
         const root = createRoot(el);
         root.render(<App {...props} />);
